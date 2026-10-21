@@ -30,8 +30,8 @@
 
 // === CONFIGURACAO DO WI-FI ====================
 
-#define WIFI_SSID           "ALUNOS-CNA"
-#define WIFI_SENHA          "maranhaonovo2024"
+#define WIFI_SSID           "NOME_DA_REDE"
+#define WIFI_SENHA          "SENHA_DA_REDE"
 
 // Nome para acessar como http://<NOME_MDNS>.local
 #define NOME_MDNS           "detector-gas"
@@ -336,7 +336,8 @@ void lerSensor() {
     // Liga o alerta acima do limite; so desliga quando cair abaixo de (limite - HISTERESE)
     if (!critico && nivel > limite) {
         critico = true;
-    } else if (critico && nivel + HISTERESE < limite) {
+    } 
+    else if (critico && nivel + HISTERESE < limite) {
         critico = false;
     }
 
@@ -353,7 +354,9 @@ void lerSensor() {
     historicoTempos[indiceHistorico]  = millis();
     historicoCritico[indiceHistorico] = critico;
     indiceHistorico = (indiceHistorico + 1) % TAMANHO_HISTORICO;
+
     if (totalHistorico < TAMANHO_HISTORICO) totalHistorico++;
+
     xSemaphoreGive(mutexDados);
 
     // Formato compativel com o Plotter Serial da Arduino IDE
@@ -363,7 +366,7 @@ void lerSensor() {
 // Tarefa que roda sozinha, independente do Wi-Fi e do MQTT
 void tarefaSensor(void* parametro) {
     TickType_t ultimoDespertar = xTaskGetTickCount();
-    for (;;) {
+    while(1) {
         lerSensor();
         vTaskDelayUntil(&ultimoDespertar, pdMS_TO_TICKS(INTERVALO_LEITURAS));
     }
@@ -466,10 +469,14 @@ void conectarMqtt() {
         mqtt.publish(TOPICO_STATUS, "online", true);
         publicarHistorico();
         ultimoHistoricoMqtt = millis();
-    } else {
+    } 
+    else {
         // Codigos: -4 tempo esgotado, -2 falha de rede/certificado, 4 usuario ou senha errados, 5 nao autorizado
-        Serial.printf("falhou (codigo %d). Nova tentativa em %d s\n",
-                      mqtt.state(), INTERVALO_RECONEXAO_MQTT / 1000);
+        Serial.printf(
+            "falhou (codigo %d). Nova tentativa em %d s\n",
+            mqtt.state(), 
+            (INTERVALO_RECONEXAO_MQTT / 1000)
+        );
     }
 }
 
@@ -508,7 +515,8 @@ void setup() {
         if (MDNS.begin(NOME_MDNS)) {
             Serial.println("Ou em: http://" NOME_MDNS ".local");
         }
-    } else {
+    } 
+    else {
         Serial.println("Nao conectou ainda. O ESP32 vai continuar tentando sozinho.");
     }
 
@@ -550,7 +558,8 @@ void loop() {
                 ultimaTentativaMqtt = millis();
                 conectarMqtt();
             }
-        } else {
+        } 
+        else {
             mqtt.loop();
 
             if (millis() - ultimaPublicacaoMqtt >= INTERVALO_PUBLICACAO_MQTT) {
