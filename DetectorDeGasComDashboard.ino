@@ -360,7 +360,7 @@ void lerSensor() {
     xSemaphoreGive(mutexDados);
 
     // Formato compativel com o Plotter Serial da Arduino IDE
-    Serial.printf("gas:%u,limite:%u,pot:%u\n", nivel, limite, (uint16_t)leituraPot);
+    Serial.printf("gas:%u\tlimite:%u\tpot:%u\n", nivel, limite, (uint16_t)leituraPot);
 }
 
 // Tarefa que roda sozinha, independente do Wi-Fi e do MQTT
